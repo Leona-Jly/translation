@@ -2,11 +2,12 @@
 
 # React Router v4 中文文档
 
-### [英文原文链接](https://reacttraining.com/react-router/core/guides/philosophy)
+### [英文原文链接](https://reacttraining.com/react-router/web/guides/philosophy)
 
+# WEB
 ## Guides 指南
 ### 理念
-这篇指南的目的是为了解释使用React Router时的构思模型。我们称之为"动态路由"，与你们可能更熟悉的静态路由有相当大的区别。
+这篇指南的目的是为了解释使用React Router时的心智模型。我们称之为"动态路由"，与你们可能更熟悉的静态路由有相当大的区别。
 
 #### Static Routing 静态路由
 如果你用过Rails、Express、Ember、Angular等等，你肯定已经用过静态路由。这些框架在渲染之前就需要声明路由作为app初始化的一部分。React Router在v4版本之前(大部分)也是静态的。让我们看下在express框架中是如何设置路由的：
@@ -71,7 +72,7 @@ export default Router
 要想学好React Router，就要忘光之前的模式！:O
 
 #### 背景
-坦白说，我们都对在React Router v2中采取的方式感到很失望。我们(Michael and Ryan)意识到自己只是又重新实现了部分的React(生命周期等)，这与React编写用户界面所用的构思模型不相符。我们觉得被API限制住了。
+坦白说，我们都对在React Router v2中采取的方式感到很失望。我们(Michael and Ryan)意识到自己只是又重新实现了部分的React(生命周期等)，这与React编写用户界面所用的心智模型不相符。我们觉得被API限制住了。
 
 在准备去开应对会议之前，我们走在酒店的走廊，互相问对方: "如果用我们在研讨会上教授的模式来建立路由会怎么样呢？"
 
@@ -120,7 +121,7 @@ const App = () => (
 )
 ```
 
-`Route`会渲染`<Dashboard {...props}/>`，其中`props`是路由特定的一些参数，像`{ match, location, history }`。如果用户**没有**访问`/dashboard`，则`Route`会渲染`null`。就是这样，喵~
+`Route`会渲染`<Dashboard {...props}/>`，其中`props`是路由特定的一些属性，像`{ match, location, history }`。如果用户**没有**访问`/dashboard`，则`Route`会渲染`null`。就是这样，喵~
 
 #### Nested Routes 嵌套路由
 许多路由都有"嵌套路由"的概念。如果你用过React Router v4之前的版本，你应该也知道！将静态路由配置为动态后，该如何"嵌套路由"呢？想想，你都是怎么嵌套`div`的？
@@ -277,6 +278,318 @@ const Invoices = () => (
 这只是其中一个例子。我们可以讨论的还有很多，但总结起来就是以下建议：将你们的直觉和React Router的理念保持一致，多想想组件，而不是静态路由。遇到问题时，想想如何用React的声明式可组合性来解决，因为几乎每个"React Router问题"都是"React问题"。
 
 ### 快速开始
+开始一个React web项目最简单的方法就是使用Facebook开发的[Create React App](https://github.com/facebookincubator/create-react-app)工具，其拥有大量的社区帮助。
+
+首先，若没有create-react-app则先安装，然后用其生成一个新项目。
+```
+npm install -g create-react-app
+create-react-app demo-app
+cd demo-app
+```
+
+#### 安装
+npm上已发布[React Router DOM](https://npm.im/react-router-dom)，你可以用`npm`或者`yarn`进行安装。Create React App用的是yarn，所以我们在此也用yarn。
+```
+yarn add react-router-dom
+# 或者，如果你用的不是yarn
+npm install react-router-dom
+```
+
+现在你可以复制黏贴任何一个例子到`src/App.js`中了。这里是个基础例子：
+```js
+import React from 'react'
+import {
+  BrowserRouter as Router,
+  Route,
+  Link
+} from 'react-router-dom'
+
+const Home = () => (
+  <div>
+    <h2>Home</h2>
+  </div>
+)
+
+const About = () => (
+  <div>
+    <h2>About</h2>
+  </div>
+)
+
+const Topic = ({ match }) => (
+  <div>
+    <h3>{match.params.topicId}</h3>
+  </div>
+)
+
+const Topics = ({ match }) => (
+  <div>
+    <h2>Topics</h2>
+    <ul>
+      <li>
+        <Link to={`${match.url}/rendering`}>
+          Rendering with React
+        </Link>
+      </li>
+      <li>
+        <Link to={`${match.url}/components`}>
+          Components
+        </Link>
+      </li>
+      <li>
+        <Link to={`${match.url}/props-v-state`}>
+          Props v. State
+        </Link>
+      </li>
+    </ul>
+
+    <Route path={`${match.url}/:topicId`} component={Topic}/>
+    <Route exact path={match.url} render={() => (
+      <h3>Please select a topic.</h3>
+    )}/>
+  </div>
+)
+
+const BasicExample = () => (
+  <Router>
+    <div>
+      <ul>
+        <li><Link to="/">Home</Link></li>
+        <li><Link to="/about">About</Link></li>
+        <li><Link to="/topics">Topics</Link></li>
+      </ul>
+
+      <hr/>
+
+      <Route exact path="/" component={Home}/>
+      <Route path="/about" component={About}/>
+      <Route path="/topics" component={Topics}/>
+    </div>
+  </Router>
+)
+export default BasicExample
+```
+
+现在你可以开始探索了。旅途快乐！
+
+### 服务端渲染
+因为服务器端是无状态的，所以渲染起来有些不同。基本思路就是用无状态的[<StaticRouter>](#StaticRouter)代替[<BrowserRouter>](#BrowserRouter)将app包裹起来，并且传入两个属性值。一个属性是服务端返回的url，这样路由就可进行匹配；另一个属性是`context`，我们之后会讨论。
+```js
+// 客户端
+<BrowserRouter>
+  <App/>
+</BrowserRouter>
+
+// 服务端(非完整版)
+<StaticRouter
+  location={req.url}
+  context={context}
+>
+  <App/>
+</StaticRouter>
+```
+
+在客户端渲染[<Redirect>](#Redirect)时，浏览器历史记录改变了app状态，展现出新页面。然而在静态服务端环境中，app状态无法被改变。所以，我们需要`context`属性来判断渲染结果。若存在`context.url`，则表示app已重定向。这样我们就能实现服务端重定向。
+```js
+const context = {}
+const markup = ReactDOMServer.renderToString(
+  <StaticRouter
+    location={req.url}
+    context={context}
+  >
+    <App/>
+  </StaticRouter>
+)
+
+if (context.url) {
+  // 某处渲染了重定向`<Redirect>`
+  redirect(301, context.url)
+} else {
+  // 一切安好，发送response
+}
+```
+
+#### 添加app特定上下文信息
+路由永远只会添加`context.url`属性。若想要某些为301重定向，其他为302，或者想要在某些特定的用户界面被渲染时发送404响应，又或者想要当用户未验证时发送401，都可以通过改变上下文属性来实现。下面是个区别301和302重定向的例子：
+```
+const RedirectWithStatus = ({ from, to, status }) => (
+  <Route render={({ staticContext }) => {
+    // 客户端没有静态上下文`staticContext`属性，所以需在此防一下
+    if (staticContext)
+      staticContext.status = status
+    return <Redirect from={from} to={to}/>
+  }}/>
+)
+
+// app客户端
+const App = () => (
+  <Switch>
+    {/* 其他路由 */}
+    <RedirectWithStatus
+      status={301}
+      from="/users"
+      to="/profiles"
+    />
+    <RedirectWithStatus
+      status={302}
+      from="/courses"
+      to="/dashboard"
+    />
+  </Switch>
+)
+
+// 服务端
+const context = {}
+
+const markup = ReactDOMServer.renderToString(
+  <StaticRouter context={context}>
+    <App/>
+  </StaticRouter>
+)
+
+if (context.url) {
+  // 可在此处用RedirectWithStatus中添加的`context.status`
+  redirect(context.status, context.url)
+}
+```
+
+#### 404、401或其他状态
+同上。创建一个组件添加上下文属性，然后在app中不同的地方渲染得到不同的状态码。
+```js
+const Status = ({ code, children }) => (
+  <Route render={({ staticContext }) => {
+    if (staticContext)
+      staticContext.status = code
+    return children
+  }}/>
+)
+```
+
+现在你可以在app任何一个你想要添加状态码到`staticContext`的地方渲染`Status`组件。
+```js
+const NotFound = () => (
+  <Status code={404}>
+    <div>
+      <h1>Sorry, can’t find that.</h1>
+    </div>
+  </Status>
+)
+
+// 其他地方
+<Switch>
+  <Route path="/about" component={About}/>
+  <Route path="/dashboard" component={Dashboard}/>
+  <Route component={NotFound}/>
+</Switch>
+```
+
+#### 汇总
+这不是一个真实的app，但是它展示了所有你需要的通用代码部分。
+```js
+import { createServer } from 'http'
+import React from 'react'
+import ReactDOMServer from 'react-dom/server'
+import { StaticRouter } from 'react-router'
+import App from './App'
+
+createServer((req, res) => {
+  const context = {}
+
+  const html = ReactDOMServer.renderToString(
+    <StaticRouter
+      location={req.url}
+      context={context}
+    >
+      <App/>
+    </StaticRouter>
+  )
+
+  if (context.url) {
+    res.writeHead(301, {
+      Location: context.url
+    })
+    res.end()
+  } else {
+    res.write(`
+      <!doctype html>
+      <div id="app">${html}</div>
+    `)
+    res.end()
+  }
+}).listen(3000)
+```
+
+接下来是客户端：
+```js
+import ReactDOM from 'react-dom'
+import { BrowserRouter } from 'react-router-dom'
+import App from './App'
+
+ReactDOM.render((
+  <BrowserRouter>
+    <App/>
+  </BrowserRouter>
+), document.getElementById('app'))
+```
+
+#### 数据加载
+加载数据有无数种方式，且没有定论哪种是最佳实践，所以我们兼容所有方法，没有任何偏向。我们有信心路由能高度符合你的项目要求。
+
+最基本的要求是在渲染前加载数据。React Router提供了`matchPath`静态函数来匹配路由。在服务端使用此函数可以在渲染前判断需要用到哪个数据。
+
+此方法的要点是要配置好静态路由，这样既能渲染路由页面，又能判断渲染前的数据依赖。
+
+```js
+const routes = [
+  { path: '/',
+    component: Root,
+    loadData: () => getSomeData(),
+  },
+  // 等等
+]
+```
+
+配置好后使用此路由渲染app页面：
+```js
+import { routes } from './routes'
+
+const App = () => (
+  <Switch>
+    {routes.map(route => (
+      <Route {...route}/>
+    ))}
+  </Switch>
+)
+```
+
+服务端写法：
+```
+import { matchPath } from 'react-router-dom'
+
+// 请求内部
+const promises = []
+// 使用`some`方法来模拟`<Switch>`的行为，只挑选出首个匹配的值
+routes.some(route => {
+  // 在这里使用`matchPath`
+  const match = matchPath(req.url, route)
+  if (match)
+    promises.push(route.loadData(match))
+  return match
+})
+
+Promise.all(promises).then(data => {
+  // 处理data数据，以便于客户端渲染app
+})
+```
+
+最后，客户端接受数据。再次说明，我们没有硬性规定数据加载模式，但这些都是实现要点。
+
+[React Router Config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)安装包提供了静态路由配置，来协助数据加载以及服务端渲染。若有兴趣，[请点此](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)。
+
+纯个人手工翻译的英文文章，水平有限，请见谅！若有误，欢迎讨论或指出错误，谢谢！
+### 代码分离
+
+### 滚动恢复
 
 ### 测试
 
