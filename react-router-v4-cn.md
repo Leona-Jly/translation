@@ -411,7 +411,7 @@ if (context.url) {
 
 #### 添加app特定上下文信息
 路由永远只会添加`context.url`属性。若想要某些为301重定向，其他为302，或者想要在某些特定的用户界面被渲染时发送404响应，又或者想要当用户未验证时发送401，都可以通过改变上下文属性来实现。下面是个区别301和302重定向的例子：
-```
+```js
 const RedirectWithStatus = ({ from, to, status }) => (
   <Route render={({ staticContext }) => {
     // 客户端没有静态上下文`staticContext`属性，所以需在此防一下
@@ -563,7 +563,7 @@ const App = () => (
 ```
 
 服务端写法：
-```
+```js
 import { matchPath } from 'react-router-dom'
 
 // 请求内部
@@ -587,7 +587,7 @@ Promise.all(promises).then(data => {
 [React Router Config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)安装包提供了静态路由配置，来协助数据加载以及服务端渲染。若有兴趣，[请点此](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)。
 
 ### 代码分离
-web应用有一个很大的特点是用户无需下载完整即可使用。你可以把代码分离看做是应用的按需加载。代码分离工具有很多，这里我们使用[Webpack](https://webpack.github.io/)和[bundle loader](https://github.com/webpack-contrib/bundle-loader)。
+web应用有一个很大的特点是用户无需下载完整即可使用。你可以把代码分离看做是应用的按需加载。代码分离工具有很多，这里我们使用[Webpack](https://webpack.github.io/)的[bundle loader](https://github.com/webpack-contrib/bundle-loader)。
 
 这里有个分离代码的方式：`<Bundle>`。需要着重注意的是路由与其毫无关系。"在某路由中"仅代表"正在渲染某组件"。所以当用户进行导航跳转时，我们提供一个能加载动态引入的组件就行了。此方法能适用于任意APP：
 ```js
@@ -655,7 +655,72 @@ export default Bundle
 
 **为什么使用bundle loader，而不是`import()`？**
 
-我们已经用了[多年了](https://github.com/ReactTraining/react-router/blob/9f43019b26ad625ce4673e6abf5aa0093d7a7ef4/package.json#L17)
+我们已经使用bundle loader[多年了](https://github.com/ReactTraining/react-router/blob/9f43019b26ad625ce4673e6abf5aa0093d7a7ef4/package.json#L17)，并且在TC39继续推出官方动态引入(dynamic import)后仍在使用(? We’ve been using it for years and it continues to work while TC39 continues to come up with an official dynamic import.)。最新的提案是[import()](https://github.com/tc39/proposal-dynamic-import)，我们可以将`Bundle`组件改为使用`import()`的写法：
+```js
+<Bundle load={() => import('./something')}>
+  {(mod) => ()}
+</Bundle>
+```
+
+另一个使用bundle loader的巨大好处是，它的第二次回调是同步的，这样每次访问一个代码分离页面时就不会出现加载页面的闪动。
+
+不管用何种方式进行引入，理念是一样的：组件在渲染时会处理代码的加载(? a component that handles the code loading when it renders)。现在你所要做的就是在需要动态加载代码的地方渲染`<Bundle>`组件。
+
+
+#### 渲染完成后加载
+`Bundle`组件不仅有助于进入新页面时的加载，也有助于在后台预加载app的其余部分。
+```js
+import loadAbout from 'bundle-loader?lazy!./loadAbout'
+import loadDashboard from 'bundle-loader?lazy!./loadDashboard'
+
+// 组件在初始化时加载他们对应的模块
+const About = (props) => (
+  <Bundle load={loadAbout}>
+    {(About) => <About {...props}/>}
+  </Bundle>
+)
+
+const Dashboard = (props) => (
+  <Bundle load={loadDashboard}>
+    {(Dashboard) => <Dashboard {...props}/>}
+  </Bundle>
+)
+
+class App extends React.Component {
+  componentDidMount() {
+    // 预加载其余的
+    loadAbout(() => {})
+    loadDashboard(() => {})
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Welcome!</h1>
+        <Route path="/about" component={About}/>
+        <Route path="/dashboard" component={Dashboard}/>
+      </div>
+    )
+  }
+}
+```
+
+app何时加载以及加载多少，由你自己而非某些特定路由决定。也许你想在用户非活跃状态时加载，也许在用户访问一个特定路由时加载，也许你想在初始化渲染后就预加载app其余部分：
+```js
+ReactDOM.render(<App/>, preloadTheRestOfTheApp)
+```
+
+#### 代码分离 + 服务端渲染
+我们尝试了几次，失败了几次，学到了经验：
+1. 须在服务端同步解析模块，才能在初始渲染时就拿到模块(? bundles)。
+2. 客户端在渲染之前就要加载所有服务端所涉及渲染的模块，这样才能保持客户端与服务端的统一。(最难的部分，我觉得是可以做到的，但我选择放弃。)
+3. app其余部分使用异步的解决方法。
+
+因为我们的网站在没有服务端渲染的情况下，也能在谷歌搜索中有不错的排名，所以我们使用了代码分离 + service worker缓存的技术来代替之。祝那些使用服务端渲染及代码分离的app成功。
+
+### 滚动复位
+
+React Router早些版本提供了开箱即用的滚动复位。
 
 
 
@@ -673,12 +738,6 @@ export default Bundle
 
 
 
-
-
-
-
-
-### 滚动恢复
 
 ### 测试
 
