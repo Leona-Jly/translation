@@ -587,6 +587,96 @@ Promise.all(promises).then(data => {
 [React Router Config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)安装包提供了静态路由配置，来协助数据加载以及服务端渲染。若有兴趣，[请点此](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)。
 
 ### 代码分离
+web应用有一个很大的特点是用户无需下载完整即可使用。你可以把代码分离看做是应用的按需加载。代码分离工具有很多，这里我们使用[Webpack](https://webpack.github.io/)和[bundle loader](https://github.com/webpack-contrib/bundle-loader)。
+
+这里有个分离代码的方式：`<Bundle>`。需要着重注意的是路由与其毫无关系。"在某路由中"仅代表"正在渲染某组件"。所以当用户进行导航跳转时，我们提供一个能加载动态引入的组件就行了。此方法能适用于任意APP：
+```js
+import loadSomething from 'bundle-loader?lazy!./Something'
+
+<Bundle load={loadSomething}>
+  {(mod) => (
+    // 处理mod模块
+  )}
+</Bundle>
+```
+
+若模块为组件，则可进行渲染：
+```js
+<Bundle load={loadSomething}>
+  {(Comp) => (Comp
+    ? <Comp/>
+    : <Loading/>
+  )}
+</Bundle>
+```
+
+`Bundle`组件接收一个`load`属性，属性值为webpack的[bundle loader](https://github.com/webpack-contrib/bundle-loader)中引入的值。稍后会解释为何使用它。组件在挂载或者接收新的`load`属性值时会调用`load`，并将其返回值放入state中，最后在render中使用模块进行渲染。
+```js
+// 接上例
+import React, { Component } from 'react'
+
+class Bundle extends Component {
+  state = {
+    // "module"是js关键字，故用简称"mod"
+    mod: null
+  }
+
+  componentWillMount() {
+    this.load(this.props)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.load !== this.props.load) {
+      this.load(nextProps)
+    }
+  }
+
+  load(props) {
+    this.setState({
+      mod: null
+    })
+    props.load((mod) => {
+      this.setState({
+        // 对es imports以及commonJS进行处理
+        mod: mod.default ? mod.default : mod
+      })
+    })
+  }
+
+  render() {
+    return this.state.mod ? this.props.children(this.state.mod) : null
+  }
+}
+
+export default Bundle
+```
+
+`render`在模块加载出来之前，得到的`state.mod`都是null。这点非常重要，因为能暗示用户我们需要等待某件事情。
+
+**为什么使用bundle loader，而不是`import()`？**
+
+我们已经用了[多年了](https://github.com/ReactTraining/react-router/blob/9f43019b26ad625ce4673e6abf5aa0093d7a7ef4/package.json#L17)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### 滚动恢复
 
