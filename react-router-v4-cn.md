@@ -586,7 +586,6 @@ Promise.all(promises).then(data => {
 
 [React Router Config](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)安装包提供了静态路由配置，来协助数据加载以及服务端渲染。若有兴趣，[请点此](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config)。
 
-纯个人手工翻译的英文文章，水平有限，请见谅！若有误，欢迎讨论或指出错误，谢谢！
 ### 代码分离
 
 ### 滚动恢复
