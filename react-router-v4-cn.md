@@ -373,7 +373,7 @@ export default BasicExample
 现在你可以开始探索了。旅途快乐！
 
 ### 服务端渲染
-因为服务器端是无状态的，所以渲染起来有些不同。基本思路就是用无状态的[<StaticRouter>](#StaticRouter)代替[<BrowserRouter>](#BrowserRouter)将app包裹起来，并且传入两个属性值。一个属性是服务端返回的url，这样路由就可进行匹配；另一个属性是`context`，我们之后会讨论。
+因为服务器端是无状态的，所以渲染起来有些不同。基本思路就是用无状态的StaticRouter[<StaticRouter>](#StaticRouter)代替BrowserRouter[<BrowserRouter>](#BrowserRouter)将app包裹起来，并且传入两个属性值。一个属性是服务端返回的url，这样路由就可进行匹配；另一个属性是`context`，我们之后会讨论。
 ```js
 // 客户端
 <BrowserRouter>
@@ -389,7 +389,7 @@ export default BasicExample
 </StaticRouter>
 ```
 
-在客户端渲染[<Redirect>](#Redirect)时，浏览器历史记录改变了app状态，展现出新页面。然而在静态服务端环境中，app状态无法被改变。所以，我们需要`context`属性来判断渲染结果。若存在`context.url`，则表示app已重定向。这样我们就能实现服务端重定向。
+在客户端渲染Redirect[<Redirect>](#Redirect)时，浏览器历史记录改变了app状态，展现出新页面。然而在静态服务端环境中，app状态无法被改变。所以，我们需要`context`属性来判断渲染结果。若存在`context.url`，则表示app已重定向。这样我们就能实现服务端重定向。
 ```js
 const context = {}
 const markup = ReactDOMServer.renderToString(
