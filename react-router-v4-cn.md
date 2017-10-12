@@ -812,6 +812,194 @@ class LongContent extends Component {
 基于此，我们不再觉得我们需要提供滚动(我们跟你们一样时间有限)。但是，我们很乐意帮你们实现一个通用方案，一个甚至能在项目中富有生命的强健方案(? A solid solution could even live in the project.)。如果你开始动手了，联系我们吧 :)
 
 ### 测试
+React Router依赖于React。这影响到你们的组件测试方式，因为你们的React组件使用了我们React Router的组件。(? React Router relies on React context to work. This affects how you can test your components that use our components.)
+
+#### 上下文
+如果你想要对那些渲染出`<Link>`或者`<Route>`等的组件进行单元测试，你会得到一些关于上下文的错误和警告。你可能想要自己想办法解决路由上下文问题，但我们建议你将单元测试包裹在`<StaticRouter>`或者`<MemoryRouter>`里。看这里：
+```js
+class Sidebar extends Component {
+  // ...
+  render() {
+    return (
+      <div>
+        <button onClick={this.toggleExpand}>
+          expand
+        </button>
+        <ul>
+          {users.map(user => (
+            <li>
+               <Link to={user.path}>
+                 {user.name}
+               </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+}
+
+// 出问题了
+test('it expands when the button is clicked', () => {
+  render(
+    <Sidebar/>
+  )
+  click(theButton)
+  expect(theThingToBeOpen)
+})
+
+// 解决了！
+test('it expands when the button is clicked', () => {
+  render(
+    <MemoryRouter>
+      <Sidebar/>
+    </MemoryRouter>
+  )
+  click(theButton)
+  expect(theThingToBeOpen)
+})
+```
+就是这样。
+
+#### 从特定路由开始
+`<MemoryRouter`支持传入`initialEntries`和`initialIndex`属性，所以你可以让app(或者app的任意一部分)从一个特定路由启动。
+```js
+test('current user is active in sidebar', () => {
+  render(
+    <MemoryRouter initialEntries={[ '/users/2' ]}>
+      <Sidebar/>
+    </MemoryRouter>
+  )
+  expectUserToBeActive(2)
+})
+```
+
+#### 导航
+路由在地址(location)改变后仍有效，对此我们已经测试过多遍，所以你无须再测。若必须再测，我们可以耍点小聪明，因为一切都是在渲染(render)中发生的：
+```jsx
+import { render, unmountComponentAtNode } from 'react-dom'
+import React from 'react'
+import { Route, Link, MemoryRouter } from 'react-router-dom'
+import { Simulate } from 'react-addons-test-utils'
+
+// a way to render any part of your app inside a MemoryRouter
+// you pass it a list of steps to execute when the location
+// changes, it will call back to you with stuff like
+// `match` and `location`, and `history` so you can control
+// the flow and make assertions.
+const renderTestSequence = ({
+  initialEntries,
+  initialIndex,
+  subject: Subject,
+  steps
+}) => {
+  const div = document.createElement('div')
+
+  class Assert extends React.Component {
+
+    componentDidMount() {
+      this.assert()
+    }
+
+    componentDidUpdate() {
+      this.assert()
+    }
+
+    assert() {
+      const nextStep = steps.shift()
+      if (nextStep) {
+        nextStep({ ...this.props, div })
+      } else {
+        unmountComponentAtNode(div)
+      }
+    }
+
+    render() {
+      return this.props.children
+    }
+  }
+
+  class Test extends React.Component {
+    render() {
+      return (
+        <MemoryRouter
+          initialIndex={initialIndex}
+          initialEntries={initialEntries}
+        >
+          <Route render={(props) => (
+            <Assert {...props}>
+              <Subject/>
+            </Assert>
+          )}/>
+        </MemoryRouter>
+      )
+    }
+  }
+
+  render(<Test/>, div)
+}
+
+// our Subject, the App, but you can test any sub
+// section of your app too
+const App = () => (
+  <div>
+    <Route exact path="/" render={() => (
+      <div>
+        <h1>Welcome</h1>
+      </div>
+    )}/>
+    <Route path="/dashboard" render={() => (
+      <div>
+        <h1>Dashboard</h1>
+        <Link to="/" id="click-me">Home</Link>
+      </div>
+    )}/>
+  </div>
+)
+
+// the actual test!
+it('navigates around', (done) => {
+
+  renderTestSequence({
+
+    // tell it the subject you're testing
+    subject: App,
+
+    // and the steps to execute each time the location changes
+    steps: [
+
+      // initial render
+      ({ history, div }) => {
+        // assert the screen says what we think it should
+        console.assert(div.innerHTML.match(/Welcome/))
+
+        // now we can imperatively navigate as the test
+        history.push('/dashboard')
+      },
+
+      // second render from new location
+      ({ div }) => {
+        console.assert(div.innerHTML.match(/Dashboard/))
+
+        // or we can simulate clicks on Links instead of
+        // using history.push
+        Simulate.click(div.querySelector('#click-me'), {
+          button: 0
+        })
+      },
+
+      // final render
+      ({ location }) => {
+        console.assert(location.pathname === '/')
+        // you'll want something like `done()` so your test
+        // fails if you never make it here.
+        done()
+      }
+    ]
+  })
+})
+```
+
 
 
 
