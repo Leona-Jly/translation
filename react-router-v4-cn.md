@@ -1000,27 +1000,55 @@ it('navigates around', (done) => {
 })
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### 集成redux
+Redux是React生态系统中最重要的部分。我们想要将React Router和Redux尽量完美地融合在一起。
+
+#### 被阻塞的更新
+一般情况下，React Router和Redux都能愉快地合作。但偶尔会发生组件在地址(location)改变时不进行更新的情况(子路由或者激活的导航链接不更新)。
+
+通常发生在以下情况：
+  1. 该组件通过`connect()(Comp)`与redux连接；
+  2. 该组件**不是**一个"路由组件"，即不是像这样渲染的：`<Route component={SomeConnectedThing}/>`。
+
+问题在于Redux执行了`shouldComponentUpdate`，但是它若不从路由那里接收props属性的话，是无法判断是否已经更新的(? The problem is that Redux implements shouldComponentUpdate and there’s no indication that anything has changed if it isn’t receiving props from the router.)。修复起来很简单。找到你连接(`connect`)组件的地方，将其用`withRouter`包裹起来。
+```jsx
+// 修改前
+export default connect(mapStateToProps)(Something)
+
+// 修改后
+import { withRouter } from 'react-router-dom'
+export default withRouter(connect(mapStateToProps)(Something))
+```
+
+#### 深度集成
+有些小伙伴想要：
+  - 同步路由数据到store中，且可从中进行读取；
+  - 可通过分发actions(dispatching actions)进行导航(navigate)；
+  - 在Redux开发工具中支持改变路由的可后退的调试(? have support for time travel debugging for route changes in the Redux devtools)
+
+这一切都要求更深的集成。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### 静态路由
 
