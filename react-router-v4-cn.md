@@ -1000,7 +1000,7 @@ it('navigates around', (done) => {
 })
 ```
 
-### 集成redux
+### 集成redux（初稿 by Leona）
 Redux是React生态系统中最重要的部分。我们想要将React Router和Redux尽量完美地融合在一起。
 
 #### 被阻塞的更新
@@ -1022,37 +1022,46 @@ export default withRouter(connect(mapStateToProps)(Something))
 
 #### 深度集成
 有些小伙伴想要：
-  - 同步路由数据到store中，且可从中进行读取；
+  - 同步路由数据(routing data)到store中，且可从store中读取；
   - 可通过分发actions(dispatching actions)进行导航(navigate)；
-  - 在Redux开发工具中支持改变路由的可后退的调试(? have support for time travel debugging for route changes in the Redux devtools)
+  - 在Redux开发工具中，对路由变化支持可后退式的调试(? have support for time travel debugging for route changes in the Redux devtools)
 
-这一切都要求更深的集成。
+这一切都要求更深的集成。请注意，你其实并不需要深度集成：
+  - 可后退式的调试对路由变化未必有效(? Route changes are unlikely to matter for time travel debugging)；
+  - 你可以通过传递路由组件中的`history`对象到actions中进行导航，而不是分发actions进行导航；
+  - 大部分路由组件都已经有了路由数据(routing data)这个属性(prop)，无论路由数据是来自于store还是路由器router，组件代码都是一样的；
 
+但是，我们知道还是有些人很想要深度集成，所以我们会尽量提供最好的给大家。React Router Redux包是React Router v4版本项目的一部分，在那里可以查阅到更多深度集成资料。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+[React Router Redux](https://github.com/reacttraining/react-router/tree/master/packages/react-router-redux)
 
 ### 静态路由
+React Router之前的版本都使用了静态路由配置项目的路由跳转。这使得路由的检查及匹配都发生在渲染之前。因为v4版本用动态的组件代替了静态路由配置，所以之前一些用户碰到的问题就不那么难以解决了。
+
+我们正在开发一个能让静态路由配置和React Router相结合的安装包来满足一些用户的需求。虽然现在还在开发阶段，但仍希望你们能使用看看。
+
+[React Router Config](https://github.com/reacttraining/react-router/tree/master/packages/react-router-config)
 
 ### 处理更新阻塞
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## API
