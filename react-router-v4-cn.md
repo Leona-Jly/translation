@@ -1045,28 +1045,353 @@ React Router之前的版本都使用了静态路由配置项目的路由跳转�
 ### 处理更新阻塞
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## API
-### MemoryRouter 记忆路由
+### <BrowserRouter>
+[<Route>](https://reacttraining.com/core/api/Router)路由器使用HTML5的history API(`pushState`, `replaceState`和`popstate`事件)来保证页面UI和URL保持同步。
 
+```jsx
+import { BrowserRouter } from 'react-router-dom'
+
+<BrowserRouter
+  basename={optionalString}
+  forceRefresh={optionalBool}
+  getUserConfirmation={optionalFunc}
+  keyLength={optionalNumber}
+>
+  <App/>
+</BrowserRouter>
+```
+
+#### basename: string
+所有地址(locations)的基准URL。如果你的app在服务端是部署在一个二级目录中，那么将basename设置为此二级目录。basename标准格式是有一个头部斜杠，但没有尾部斜杠。
+```jsx
+<BrowserRouter basename="/calendar"/>
+<Link to="/today"/> // 渲染结果 <a href="/calendar/today">
+```
+
+#### getUserConfirmation: func
+路由跳转时，控制弹窗确认的函数。默认使用[window.confirm](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm)。
+```jsx
+// 此为默认行为
+const getConfirmation = (message, callback) => {
+  const allowTransition = window.confirm(message)
+  callback(allowTransition)
+}
+
+<BrowserRouter getUserConfirmation={getConfirmation}/>
+```
+
+#### forceRefresh: bool
+为`true`时，导航时强制刷新页面。你可能只想在[浏览器不支持HTML5 history API](http://caniuse.com/#feat=history)时刷新。
+```jsx
+const supportsHistory = 'pushState' in window.history
+<BrowserRouter forceRefresh={!supportsHistory}/>
+```
+
+#### keyLength: number
+`location.key`的长度。默认为6。
+```jsx
+<BrowserRouter keyLength={12}/>
+```
+
+#### children: node
+渲染[单一子元素](https://facebook.github.io/react/docs/react-api.html#react.children.only)。
+
+### <HashRouter>
+[<Route>](https://reacttraining.com/core/api/Router)路由器使用URL的哈希部分(即`window.location.hash`)来保证页面UI和URL保持同步。
+
+**重要提示：**hash history不支持`location.key`或者`location.state`。在之前的版本中，我们尝试使用垫片(shim)，但仍无法解决某些极端情况。任何需要用到`location.key`或者`location.state`的代码或插件都无法使用。由于该技术仅是用于支持旧版浏览器，我们建议配置好服务端，使用`<BrowserHistory>`来代替。
+
+```jsx
+import { HashRouter } from 'react-router-dom'
+
+<HashRouter>
+  <App/>
+</HashRouter>
+```
+
+#### basename: string
+所有地址(locations)的基准URL。basename标准格式是有一个头部斜杠，但没有尾部斜杠。
+```jsx
+<HashRouter basename="/calendar"/>
+<Link to="/today"/> // 渲染结果 <a href="#/calendar/today">
+```
+
+#### getUserConfirmation: func
+路由跳转时，控制弹窗确认的函数。默认使用[window.confirm](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm)。
+```jsx
+// 此为默认行为
+const getConfirmation = (message, callback) => {
+  const allowTransition = window.confirm(message)
+  callback(allowTransition)
+}
+
+<HashRouter getUserConfirmation={getConfirmation}/>
+```
+
+#### hashType: string
+`window.location.hash`的编码类型。可选值有：
+  - `"slash"` - 格式为`#/`以及`#/sunshine/lollipops`
+  - `"noslash"` - 格式为`#`以及`#sunshine/lollipops`
+  - `"hashbang"` - 格式为["ajax crawlable"](https://developers.google.com/webmasters/ajax-crawling/docs/learn-more)(被谷歌弃用)，如`#!/`以及`#!/sunshine/lillipops`
+
+默认为`"slash"`。
+
+#### children: node
+渲染[单一子元素](https://facebook.github.io/react/docs/react-api.html#react.children.only)。
+
+### <Link>
+为应用提供声明式、无障碍导航。
+```jsx
+import { Link } from 'react-router-dom'
+
+<Link to="/about">About</Link>
+```
+
+#### to: string
+跳转目标的路径(pathname)或地址(location)。
+```jsx
+<Link to="/courses"/>
+```
+
+#### to: object
+跳转目标的地址(location)对象。
+```jsx
+<Link to={{
+  pathname: '/courses',
+  search: '?sort=name',
+  hash: '#the-hash',
+  state: { fromDashboard: true }
+}}/>
+```
+
+#### replace: bool
+为`true`时，点击链接会将历史记录栈中的当前地址替换为此链接地址，为false时，则往历史记录栈中增加此链接地址。
+```jsx
+<Link to="/courses" replace />
+```
+
+### <NavLink>
+[Link](https://reacttraining.com/react-router/Link.md)的特殊形式。当路由匹配当前URL时，会给渲染出的元素增加样式属性。
+```jsx
+import { NavLink } from 'react-router-dom'
+
+<NavLink to="/about">About</NavLink>
+```
+
+#### activeClassName: string
+当NavLink为激活状态时，会添加此样式class。默认为`active`。此class会追加到`className`属性中。
+```jsx
+<NavLink
+  to="/faq"
+  activeClassName="selected"
+>FAQs</NavLink>
+```
+
+#### activeStyle: object
+当NavLink为激活状态时，会添加此style对象。
+```jsx
+<NavLink
+  to="/faq"
+  activeStyle={{
+    fontWeight: 'bold',
+    color: 'red'
+   }}
+>FAQs</NavLink>
+```
+
+#### exact: bool
+为`true`时，只有当地址完全匹配时，class及style才有效。
+```jsx
+<NavLink
+  exact
+  to="/profile"
+>Profile</NavLink>
+```
+
+#### strict: bool
+为`true`时，会把location中`pathname`的尾部斜杠也列入判断location是否匹配当前URL的标准。更多信息查看[<Route strict>](https://reacttraining.com/core/api/Route/strict-bool)。
+```jsx
+<NavLink
+  strict
+  to="/events/"
+>Events</NavLink>
+```
+
+#### isActive: func
+此方法可以为判断link是否激活增加额外逻辑。当你想要做的不仅仅是判断link的pathname是否匹配当前URL的`pathname`时，你可以用此方法。
+```jsx
+// 只有在事件ID(event id)为单数时才算是激活状态(active)
+const oddEvent = (match, location) => {
+  if (!match) {
+    return false
+  }
+  const eventID = parseInt(match.params.eventID)
+  return !isNaN(eventID) && eventID % 2 === 1
+}
+
+<NavLink
+  to="/events/123"
+  isActive={oddEvent}
+>Event 123</NavLink>
+```
+
+#### location: object
+[isActive](https://reacttraining.com/web/api/NavLink/isactive-func)是比较路由与当前历史地址是否匹配(通常是当前浏览器URL)。若需要比较路由与一个不同的地址是否匹配，可传入[location](https://reacttraining.com/core/api/location)属性。
+
+### <Prompt>
+(以下为react router core中Prompt部分)
+离开页面时对用户的弹窗提醒。当出现想要阻止用户跳出当前页面的情况时(如表单只填了一半)，渲染`<Prompt>`标签。
+
+```jxs
+import { Prompt } from 'react-router'
+
+<Prompt
+  when={formIsHalfFilledOut}
+  message="Are you sure you want to leave?"
+/>
+```
+
+#### message: string
+用户想要离开当前页时的弹窗信息。
+```jsx
+<Prompt message="Are you sure you want to leave?"/>
+```
+
+#### message: func
+会和用户跳转目标页中的`location`和`action`一起被调用。若返回字符串，则弹窗展示信息，若返回`true`，则进行跳转。
+```jsx
+<Prompt message={location => (
+  `Are you sure you want to go to ${location.pathname}?`
+)}/>
+```
+
+#### when: bool
+无需通过条件判断是否需要渲染`<Prompt>`，只需传入`when={true}`或者`when={false}`来阻止或允许导航跳转。
+```jsx
+<Prompt when={formIsHalfFilledOut} message="Are you sure?"/>
+```
+
+### <MemoryRouter>
+能记住"URL"的[Router](https://reacttraining.com/react-router/Router.md)(不会读写地址栏)。在测试以及无浏览器环境，如[React Native](https://facebook.github.io/react-native/)中很有用。
+
+```jsx
+import { MemoryRouter } from 'react-router'
+
+<MemoryRouter>
+  <App/>
+</MemoryRouter>
+```
+
+#### initialEntries: array
+在历史栈中的`location`数组。数组元素可以是含有`{ pathname, search, hash, state }`的完整location对象，也可以是URL字符串。
+```jsx
+<MemoryRouter
+  initialEntries={[ '/one', '/two', { pathname: '/three' } ]}
+  initialIndex={1}
+>
+  <App/>
+</MemoryRouter>
+```
+
+#### initialIndex: number
+initialEntries数组中的初始地址索引。
+
+#### getUserConfirmation: func
+路由跳转时，控制弹窗确认的函数。当`<MemoryRouter>`中直接用`<Prompt>`时，必须要加此选项。
+
+#### keyLength: number
+`location.key`的长度。默认为6。
+```jsx
+<MemoryRouter keyLength={12}/>
+```
+
+#### children: node
+渲染[单一子元素](https://facebook.github.io/react/docs/react-api.html#react.children.only)。
+
+### <Redirect>
+渲染`<Redirect>`会导航到一个新地址。新地址会覆盖历史栈中的当前地址，就像服务端的重定向一样(HTTP 3XX)。
+```jsx
+import { Route, Redirect } from 'react-router'
+
+<Route exact path="/" render={() => (
+  loggedIn ? (
+    <Redirect to="/dashboard"/>
+  ) : (
+    <PublicHomePage/>
+  )
+)}/>
+```
+
+#### to: string
+重定向目标URL。
+```jsx
+<Redirect to="/somewhere/else"/>
+```
+
+#### to: string
+重定向目标location对象。
+```jsx
+<Redirect to={{
+  pathname: '/login',
+  search: '?utm=your+face',
+  state: { referrer: currentLocation }
+}}/>
+```
+
+#### push: bool
+为`true`时，重定向会向历史栈中推入一个新地址，而非替换当前地址。
+```jsx
+<Redirect push to="/somewhere/else"/>
+```
+
+#### from: string
+需要被重定向的路径名。只有当`<Redirect>`被`<Switch>`包裹时才能使用此属性。详情参见[<Switch children>](https://reacttraining.com/web/api/Switch/children-node)
+```jsx
+<Switch>
+  <Redirect from='/old-path' to='/new-path'/>
+  <Route path='/new-path' component={Place}/>
+</Switch>
+```
+
+### <Route>
+Route组件可能是React Router中最需要着重理解和学习使用的组件。它最基本的职责是在[location](https://reacttraining.com/web/api/location)匹配路由`path`时渲染页面UI。
+
+思考以下代码：
+```jsx
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+
+<Router>
+  <div>
+    <Route exact path="/" component={Home}/>
+    <Route path="/news" component={NewsFeed}/>
+  </div>
+</Router>
+```
+
+若app的地址为`/`，UI层次如下：
+```jsx
+<div>
+  <Home/>
+  <!-- react-empty: 2 -->
+</div>
+```
+
+若app的地址为`/news`，UI层次如下：
+```jsx
+<div>
+  <!-- react-empty: 1 -->
+  <NewsFeed/>
+</div>
+```
+
+"react-empty"注释是React渲染返回`null`时的具象化，具有指导作用。从技术角度说，Route就算渲染的是`null`也算是"渲染"。当app地址匹配上路由路径时，组件就会被渲染。
+
+#### Route render methods 路由渲染方法
+`<Route>`渲染有三种方法：
+  - [<Route component>](https://reacttraining.com/web/api/Route/component)
+  - [<Route render>](https://reacttraining.com/web/api/Route/render-func)
+  - [<Route children>](https://reacttraining.com/web/api/Route/children-func)
 
 
 
