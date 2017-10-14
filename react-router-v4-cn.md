@@ -1393,11 +1393,135 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
   - [<Route render>](https://reacttraining.com/web/api/Route/render-func)
   - [<Route children>](https://reacttraining.com/web/api/Route/children-func)
 
+在不同情境下，每个都很有用。一个`<Route>`中只能使用其中一种渲染方法。下面会解释为什么有三种渲染方法。大部分情况下都是使用`component`。
 
+#### Route props 路由属性
+三种[渲染方法](https://reacttraining.com/web/api/Route/Route-render-methods)都有三个相同的属性(route props)。
+  - [match](https://reacttraining.com/web/api/match)
+  - [location](https://reacttraining.com/web/api/location)
+  - [history](https://reacttraining.com/web/api/history)
 
+#### component
+只有当地址匹配时，Route的属性component才会被渲染。此组件component接收[路由属性(route props)]参数(https://reacttraining.com/web/api/Route/Route-props)。
 
+```jsx
+<Route path="/user/:username" component={User}/>
 
+const User = ({ match }) => {
+  return <h1>Hello {match.params.username}!</h1>
+}
+```
 
+当使用`component`(而不是`render`或者`children`)时，路由器会使用[React.createElement](https://facebook.github.io/react/docs/react-api.html#createelement)来为component创建一个新的[React element](https://reactjs.org/docs/rendering-elements.html)。这意味着，若`component`属性中传入的是行内函数，则每次渲染的时候都会重新创建一个新的组件。这会导致本应直接更新的组件会先解除挂载再重新挂载。若想要使用行内函数进行渲染，请使用`render`或者`children`属性。
+
+#### render: func
+此方法能方便地进行行内渲染，并且没有上面提到的重新挂载的问题。
+
+跟使用`component`属性会创建新的`React element`不同，你可以在此属性中传入一个函数，此函数会在地址匹配时被调用。
+`render`属性会获取跟`component`属性一样的[React element](https://reactjs.org/docs/rendering-elements.html)。
+
+```jsx
+// 方便的行内渲染
+<Route path="/home" render={() => <div>Home</div>}/>
+
+// 包装/组合
+const FadingRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={props => (
+    <FadeIn>
+      <Component {...props}/>
+    </FadeIn>
+  )}/>
+)
+
+<FadingRoute path="/cool" component={Something}/>
+```
+
+**警告：**`<Route component>`优先级比`<Route render>`高，不要在一个Route中同时使用。
+
+#### children: func
+有时候不管地址是否匹配，你都需要进行渲染。那么你可以用`children`属性。`children`和`render`工作原理基本一样，但`children`不管地址是否匹配都会渲染。
+
+`children`获得的属性跟`component`和`render`一样，都是[React element](https://reactjs.org/docs/rendering-elements.html)，但是在路由和URL匹配失败时，得到的`match`是`null`。你可以根据路由匹配情况动态调整你的UI。这个例子中我们在路由匹配时添加了`active` class：
+```jsx
+<ul>
+  <ListItemLink to="/somewhere"/>
+  <ListItemLink to="/somewhere-else"/>
+</ul>
+
+const ListItemLink = ({ to, ...rest }) => (
+  <Route path={to} children={({ match }) => (
+    <li className={match ? 'active' : ''}>
+      <Link to={to} {...rest}/>
+    </li>
+  )}/>
+)
+```
+
+对于动画来说也很有用：
+```jsx
+<Route children={({ match, ...rest }) => (
+  {/* Animate总会被渲染，所以可以用生命周期控制动画的进入和退出
+  */}
+  <Animate>
+    {match && <Something {...rest}/>}
+  </Animate>
+)}/>
+```
+
+**警告：**`<Route component>`和`<Route render>`的优先级都比`<Route children>`高，不要在一个Route中同时使用。
+
+#### path: string
+任意[path-to-regexp](https://www.npmjs.com/package/path-to-regexp)能识别的有效URL。
+```jsx
+<Route path="/users/:id" component={User}/>
+```
+
+没有`path`属性的路由(Route)会匹配所有地址。
+
+#### exact: bool
+为`true`时，只有当路径和`location.pathname`完全相同时时才算匹配。
+```jsx
+<Route exact path="/one" component={About}/>
+```
+
+path | location.pathname | exact | 匹配?
+-----|-------------------|-------|------
+/one | /one/two | true | no
+/one | /one/two | false | yes
+
+#### strict: bool
+为`true`时，带有尾部斜杠的`path`只会与带有尾部斜杠的`location.pathname`匹配。`location.pathname`中是否有其他URL片段对其判断没有影响。
+
+```jsx
+<Route strict path="/one/" component={About}/>
+```
+
+path | location.pathname | matches?
+-----|-------------------|---------
+/one/ | /one | no
+/one/ | /one/ | yes
+/one/ | /one/two | yes
+
+**警告：**`strict`可以强制`location.pathname`没有尾部斜杠，但是需要同时满足`strict`和`exact`都为`true`才行。
+
+```jsx
+<Route exact strict path="/one" component={About}/>
+```
+
+path | location.pathname | matches?
+-----|-------------------|---------
+/one | /one | yes
+/one | /one/ | no
+/one | /one/two | no
+
+#### location: object
+`<Route>`元素会将自己的`path`属性和当前历史location(通常是当前浏览器URL)进行匹配。但是，`pathname`不一致的[location](https://reacttraining.com/react-router/location.md)也会匹配成功。
+
+当你想要`<Route>`和一个特定location，而不是当前历史location匹配时，此属性就显得很有用了，就像[Animated Transitions](https://reacttraining.com/react-router/web/example/animated-transitions)例子中展示的一样。
+
+如果有个`<Route>`被包在`<Switch>`里面，且与传入`<Switch>`的location地址(或者当前历史location)匹配成功，那么`<Route>`所接收到的`location`属性会被`<Switch>`的覆盖(看[这里](https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/Switch.js#L51))。
+
+### <Router>
 
 
 
