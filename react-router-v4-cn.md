@@ -1496,7 +1496,7 @@ path | location.pathname | exact | 匹配?
 <Route strict path="/one/" component={About}/>
 ```
 
-path | location.pathname | matches?
+path | location.pathname | 匹配?
 -----|-------------------|---------
 /one/ | /one | no
 /one/ | /one/ | yes
@@ -1508,7 +1508,7 @@ path | location.pathname | matches?
 <Route exact strict path="/one" component={About}/>
 ```
 
-path | location.pathname | matches?
+path | location.pathname | 匹配?
 -----|-------------------|---------
 /one | /one | yes
 /one | /one/ | no
