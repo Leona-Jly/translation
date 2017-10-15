@@ -1522,6 +1522,47 @@ path | location.pathname | 匹配?
 如果有个`<Route>`被包在`<Switch>`里面，且与传入`<Switch>`的location地址(或者当前历史location)匹配成功，那么`<Route>`所接收到的`location`属性会被`<Switch>`的覆盖(看[这里](https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/Switch.js#L51))。
 
 ### <Router>
+所有路由组件的公共底层接口。通常app会用以下其中一个高阶路由器(high-level routers)替代：
+  - [<BrowsweRouter](https://reacttraining.com/web/api/BrowserRouter)
+  - [<HashRouter>](https://reacttraining.com/web/api/HashRouter)
+  - [<MemoryRouter>](https://reacttraining.com/react-router/)
+  - [<NativeRouter>](https://reacttraining.com/native/api/NativeRouter)
+  - [<StaticRouter>](https://reacttraining.com/react-router/)
+
+通常是在想要同步自定义history和状态管理库如Redux或者Mobx时使用底层路由器`<Router>`。注意这并不意味着状态管理库一定要和React Router一起使用，这只是为了深度集成。
+
+```jsx
+import { Router } from 'react-router'
+import createBrowserHistory from 'history/createBrowserHistory'
+
+const history = createBrowserHistory()
+
+<Router history={history}>
+  <App/>
+</Router>
+```
+
+#### history: object
+起到导航作用的[history](https://github.com/ReactTraining/history)对象。
+```jsx
+import createBrowserHistory from 'history/createBrowserHistory'
+
+const customHistory = createBrowserHistory()
+<Router history={customHistory}/>
+```
+
+#### children: node
+渲染[单一子元素](https://reactjs.org/docs/react-api.html#react.children.only)。
+```jsx
+<Router>
+  <App/>
+</Router>
+```
+
+### <StaticRouter>
+永远不会改变地址(location)的[<Router>](https://reacttraining.com/react-router/)。
+
+
 
 
 
