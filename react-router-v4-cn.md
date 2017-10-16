@@ -1562,7 +1562,38 @@ const customHistory = createBrowserHistory()
 ### <StaticRouter>
 永远不会改变地址(location)的[<Router>](https://reacttraining.com/react-router/)。
 
+在用户没有点击时，此标签对服务端渲染很有用，所以地址(location)实际上不会改变。因此得名静态路由(static)。在你想做个简单测试需要插入地址(location)并且在渲染输出中做出断言时也很有用。
 
+下面有个例子，node服务器接收到[<Redirect>](https://reacttraining.com/react-router/Redirect.md)时发送302状态码，接收到其他请求时发送普通HTML：
+
+```js
+import { createServer } from 'http'
+import React from 'react'
+import ReactDOMServer from 'react-dom/server'
+import { StaticRouter } from 'react-router'
+
+createServer((req, res) => {
+
+  // 这个context对象包含渲染结果
+  const context = {}
+
+  const html = ReactDOMServer.renderToString(
+    <StaticRouter location={req.url} context={context}>
+      <App/>
+    </StaticRouter>
+  )
+  // 如果<Redirect>被触发，context.url中会包含重定向目标URL
+  if (context.url) {
+    res.writeHead(302, {
+      Location: context.url
+    })
+    res.end()
+  } else {
+    res.write(html)
+    res.end()
+  }
+}).listen(3000)
+```
 
 
 
