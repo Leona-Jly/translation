@@ -1595,10 +1595,147 @@ createServer((req, res) => {
 }).listen(3000)
 ```
 
+#### basename: string
+所有地址(locations)的基准URL。basename标准格式是有一个头部斜杠，但没有尾部斜杠。
+```jsx
+<StaticRouter basename="/calendar">
+  <Link to="/today"/> // renders <a href="/calendar/today">
+</StaticRouter>
+```
 
+#### location: string
+服务端接收到的URL，可能是node服务器的`req.url`。
+```jsx
+<StaticRouter location={req.url}>
+  <App/>
+</StaticRouter>
+```
 
+#### location: object
+一个格式类似`{ pathname, search, hash, state }`的location对象。
+```jsx
+<StaticRouter location={{ pathname: '/bubblegum' }}>
+  <App/>
+</StaticRouter>
+```
 
+#### context: object
+一个js空对象。在渲染过程中，组件会往对象中添加属性来存储渲染信息。
 
+```jsx
+const context = {}
+<StaticRouter context={context}>
+  <App />
+</StaticRouter>
+```
 
+`<Route>`匹配成功时，会在其渲染出的组件中，将context对象作为`staticContext`属性传入。了解更多信息请查看[Server Rendering guide](https://reacttraining.com/web/guides/server-rendering)。
+
+渲染完成后，这些属性可以用来配置服务端的响应(response)。
+```jsx
+if(context.status === '404') {
+  // ...
+}
+```
+
+#### children: node
+渲染[单一子元素](https://reactjs.org/docs/react-api.html#react.children.only)。
+
+### &lt;Switch&gt;
+渲染子元素中首个匹配地址(location)的[&lt;Route&gt;](https://reacttraining.com/react-router/)或者[&lt;Route&gt;](https://reacttraining.com/react-router/);
+
+**这和直接渲染一组&lt;Route&gt;s有什么不同呢？**
+
+`<Switch>`只会渲染**一个**路由。而`<Route>`会渲染**所有匹配地址**的路由。思考以下代码：
+```jsx
+<Route path="/about" component={About}/>
+<Route path="/:user" component={User}/>
+<Route component={NoMatch}/>
+```
+
+如果URL是`/about`，那么`<About>`、`<User>`和`<NoMatch>`都会被渲染，因为他们都和path匹配成功。这种设计允许我们用多种方式组合`<Route>`到app中，比如侧边栏(sidebars)、面包屑导航(breadcrumbs)、bootstrap标签页(bootstrap tabs)等。
+
+但有时我们只想渲染其中一个`<Route>`。如果当前处于`/about`，我们不想让`/:user`也匹配成功(或者展示"404"页面)。下面展示如何使用`Switch`来实现：
+
+```jsx
+import { Switch, Route } from 'react-router'
+
+<Switch>
+  <Route exact path="/" component={Home}/>
+  <Route path="/about" component={About}/>
+  <Route path="/:user" component={User}/>
+  <Route component={NoMatch}/>
+</Switch>
+```
+
+现在如果我们处于`/about`，`<Switch>`会开始寻找一个能匹配的`<Route>`。`<Route path="/about"/>`会匹配成功，`<Switch>`就会停止寻找并渲染`<About>`。同样的，如果我们处于`/michael`，`<User>`会被渲染。
+
+因为匹配成功的`<Route>`会在前一个`<Route>`相同位置被渲染，所以对于过渡动画也很有用。
+
+```jsx
+<Fade>
+  <Switch>
+    {/* 永远只会渲染一个子元素 */}
+    <Route/>
+    <Route/>
+  </Switch>
+</Fade>
+
+<Fade>
+  <Route/>
+  <Route/>
+  {/* 永远会渲染两个子元素，但是其中一个可能会渲染null，这使得动画过渡更麻烦了点 */}
+  {/* there will always be two children here,
+      one might render null though, making transitions
+      a bit more cumbersome to work out */}
+</Fade>
+```
+
+#### Switch props
+##### location: object
+[location](https://reacttraining.com/react-router/)对象用来匹配子元素，而不是当前历史地址(通常是当前浏览器URL)；
+
+##### children: node
+`<Switch>`的所有子元素必须是`<Route>`或者`<Redirect>`。只有第一个匹配当前地址的子元素会被渲染。
+
+`<Route>`元素在`path`属性中定义匹配路由，而`<Redirect>`在`from`属性中定义。没有`path`属性的`<Route>`或者没有`from`属性的`<Redirect>`永远匹配当前地址。
+
+当`<Redirect>`被包裹在`<Switch>`中时，它可以使用`<Route>`的任意路由匹配属性：`path`、`exact`和`strict.from`只是`path`属性的别名。
+
+如果在`<Switch>`中传入`location`属性，那么匹配成功的子元素中的`location`属性会被其覆盖。
+
+```jsx
+<Switch>
+  <Route exact path="/" component={Home}/>
+
+  <Route path="/users" component={Users}/>
+  <Redirect from="/accounts" to="/users"/>
+
+  <Route component={NoMatch}/>
+</Switch>
+```
+
+### history
+此文档中的术语"history"和"`history` object"指的是[the history package](https://github.com/ReactTraining/history)，是React Router两个主要依赖之一(没有算React)。它提供了几种不同的实现方法来管理不同js环境中的session history。
+
+我们用到了以下术语：
+  - "browser history" - DOM特有，用于支持HTML 5 history API的web浏览器；
+  - "hash history" - DOM特有，用于旧版浏览器；
+  - "memory history" - 能存储history，用于测试以及非DOM环境，如React Native。
+
+`history`对象通常有以下属性及方法：
+  - length - (number) 历史栈中的数量；
+  - action - (string) 当前动作(PUSH, REPLACE, or POP)；
+  - location - (object) 当前地址。可能有以下属性：
+    - pathname - (string) URL路径；
+    - search - (string) URL的query字符串；
+    - hash - (string) URL的哈希片段；
+    - state - (string) location的状态，在当前地址被推入栈时提供给比如`push(path, [state])`。只在browser history和memory history中可用。
+  - push(path, [state]) - (function) Pushes a new entry onto the history stack
+  - replace(path, [state]) - (function) Replaces the current entry on the history stack
+  - go(n) - (function) Moves the pointer in the history stack by n entries
+  - goBack() - (function) Equivalent to go(-1)
+  - goForward() - (function) Equivalent to go(1)
+  - block(prompt) - (function) Prevents navigation (see the history docs)
 
 
