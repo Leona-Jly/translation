@@ -373,7 +373,7 @@ export default BasicExample
 现在你可以开始探索了。旅途快乐！
 
 ### 服务端渲染
-因为服务器端是无状态的，所以与客户端渲染起来有些不同。基本思路就是用无状态的StaticRouter[<StaticRouter>](#StaticRouter)代替BrowserRouter[<BrowserRouter>](#BrowserRouter)来包装app，并且传入两个属性值。一个属性是服务端返回的url，这样就能匹配路由；另一个属性是`context`，我们之后会讨论。
+因为服务器端是无状态的，所以与客户端渲染起来有些不同。基本思路就是用无状态的StaticRouter[&lt;StaticRouter&gt;](#StaticRouter)代替BrowserRouter[&lt;BrowserRouter&gt;](#BrowserRouter)来包装app，并且传入两个属性值。一个属性是服务端返回的url，这样就能匹配路由；另一个属性是`context`，我们之后会讨论。
 ```jsx
 // 客户端
 <BrowserRouter>
@@ -389,7 +389,7 @@ export default BasicExample
 </StaticRouter>
 ```
 
-在客户端渲染Redirect[<Redirect>](#Redirect)时，浏览器历史改变了app状态，展现出新视图。然而在静态服务端环境中，app状态无法被改变。所以，我们需要`context`属性来判断渲染结果。若存在`context.url`，则表示app已重定向。这样我们就能实现服务端重定向。
+在客户端渲染Redirect[&lt;Redirect&gt;](#Redirect)时，浏览器历史改变了app状态，展现出新视图。然而在静态服务端环境中，app状态无法被改变。所以，我们需要`context`属性来判断渲染结果。若存在`context.url`，则表示app已重定向。这样我们就能实现服务端重定向。
 ```jsx
 const context = {}
 const markup = ReactDOMServer.renderToString(
@@ -1046,8 +1046,8 @@ React Router之前的版本都使用了静态路由配置项目的路由跳转�
 
 
 ## API
-### <BrowserRouter>
-[<Route>](https://reacttraining.com/core/api/Router)路由器使用HTML5的history API(`pushState`, `replaceState`和`popstate`事件)来保证页面UI和URL保持同步。
+### &lt;BrowserRouter&gt;
+[&lt;Route&gt;](https://reacttraining.com/core/api/Router)路由器使用HTML5的history API(`pushState`, `replaceState`和`popstate`事件)来保证页面UI和URL保持同步。
 
 ```jsx
 import { BrowserRouter } from 'react-router-dom'
@@ -1097,8 +1097,8 @@ const supportsHistory = 'pushState' in window.history
 #### children: node
 渲染[单一子元素](https://facebook.github.io/react/docs/react-api.html#react.children.only)。
 
-### <HashRouter>
-[<Route>](https://reacttraining.com/core/api/Router)路由器使用URL的哈希部分(即`window.location.hash`)来保证页面UI和URL保持同步。
+### &lt;HashRouter&gt;
+[&lt;Route&gt;](https://reacttraining.com/core/api/Router)路由器使用URL的哈希部分(即`window.location.hash`)来保证页面UI和URL保持同步。
 
 **重要提示：**hash history不支持`location.key`或者`location.state`。在之前的版本中，我们尝试使用垫片(shim)，但仍无法解决某些极端情况。任何需要用到`location.key`或者`location.state`的代码或插件都无法使用。由于该技术仅是用于支持旧版浏览器，我们建议配置好服务端，使用`<BrowserHistory>`来代替。
 
@@ -1140,7 +1140,7 @@ const getConfirmation = (message, callback) => {
 #### children: node
 渲染[单一子元素](https://facebook.github.io/react/docs/react-api.html#react.children.only)。
 
-### <Link>
+### &lt;Link&gt;
 为应用提供声明式、无障碍导航。
 ```jsx
 import { Link } from 'react-router-dom'
@@ -1171,7 +1171,7 @@ import { Link } from 'react-router-dom'
 <Link to="/courses" replace />
 ```
 
-### <NavLink>
+### &lt;NavLink&gt;
 [Link](https://reacttraining.com/react-router/Link.md)的特殊形式。当路由匹配当前URL时，会给渲染出的元素增加样式属性。
 ```jsx
 import { NavLink } from 'react-router-dom'
@@ -1210,7 +1210,7 @@ import { NavLink } from 'react-router-dom'
 ```
 
 #### strict: bool
-为`true`时，会把location中`pathname`的尾部斜杠也列入判断location是否匹配当前URL的标准。更多信息查看[<Route strict>](https://reacttraining.com/core/api/Route/strict-bool)。
+为`true`时，会把location中`pathname`的尾部斜杠也列入判断location是否匹配当前URL的标准。更多信息查看[&lt;Route strict&gt;](https://reacttraining.com/core/api/Route/strict-bool)。
 ```jsx
 <NavLink
   strict
@@ -1239,7 +1239,7 @@ const oddEvent = (match, location) => {
 #### location: object
 [isActive](https://reacttraining.com/web/api/NavLink/isactive-func)是比较路由与当前历史地址是否匹配(通常是当前浏览器URL)。若需要比较路由与一个不同的地址是否匹配，可传入[location](https://reacttraining.com/core/api/location)属性。
 
-### <Prompt>
+### &lt;Prompt&gt;
 (以下为react router core中Prompt部分)
 离开页面时对用户的弹窗提醒。当出现想要阻止用户跳出当前页面的情况时(如表单只填了一半)，渲染`<Prompt>`标签。
 
@@ -1272,7 +1272,7 @@ import { Prompt } from 'react-router'
 <Prompt when={formIsHalfFilledOut} message="Are you sure?"/>
 ```
 
-### <MemoryRouter>
+### &lt;MemoryRouter&gt;
 能记住"URL"的[Router](https://reacttraining.com/react-router/Router.md)(不会读写地址栏)。在测试以及无浏览器环境，如[React Native](https://facebook.github.io/react-native/)中很有用。
 
 ```jsx
@@ -1309,7 +1309,7 @@ initialEntries数组中的初始地址索引。
 #### children: node
 渲染[单一子元素](https://facebook.github.io/react/docs/react-api.html#react.children.only)。
 
-### <Redirect>
+### &lt;Redirect&gt;
 渲染`<Redirect>`会导航到一个新地址。新地址会覆盖历史栈中的当前地址，就像服务端的重定向一样(HTTP 3XX)。
 ```jsx
 import { Route, Redirect } from 'react-router'
@@ -1346,7 +1346,7 @@ import { Route, Redirect } from 'react-router'
 ```
 
 #### from: string
-需要被重定向的路径名。只有当`<Redirect>`被`<Switch>`包裹时才能使用此属性。详情参见[<Switch children>](https://reacttraining.com/web/api/Switch/children-node)
+需要被重定向的路径名。只有当`<Redirect>`被`<Switch>`包裹时才能使用此属性。详情参见[&lt;Switch children&gt;](https://reacttraining.com/web/api/Switch/children-node)
 ```jsx
 <Switch>
   <Redirect from='/old-path' to='/new-path'/>
@@ -1354,7 +1354,7 @@ import { Route, Redirect } from 'react-router'
 </Switch>
 ```
 
-### <Route>
+### &lt;Route&gt;
 Route组件可能是React Router中最需要着重理解和学习使用的组件。它最基本的职责是在[location](https://reacttraining.com/web/api/location)匹配路由`path`时渲染页面UI。
 
 思考以下代码：
@@ -1389,9 +1389,9 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 
 #### Route render methods 路由渲染方法
 `<Route>`渲染有三种方法：
-  - [<Route component>](https://reacttraining.com/web/api/Route/component)
-  - [<Route render>](https://reacttraining.com/web/api/Route/render-func)
-  - [<Route children>](https://reacttraining.com/web/api/Route/children-func)
+  - [&lt;Route component&gt;](https://reacttraining.com/web/api/Route/component)
+  - [&lt;Route render&gt;](https://reacttraining.com/web/api/Route/render-func)
+  - [&lt;Route children&gt;](https://reacttraining.com/web/api/Route/children-func)
 
 在不同情境下，每个都很有用。一个`<Route>`中只能使用其中一种渲染方法。下面会解释为什么有三种渲染方法。大部分情况下都是使用`component`。
 
@@ -1521,13 +1521,13 @@ path | location.pathname | 匹配?
 
 如果有个`<Route>`被包在`<Switch>`里面，且与传入`<Switch>`的location地址(或者当前历史location)匹配成功，那么`<Route>`所接收到的`location`属性会被`<Switch>`的覆盖(看[这里](https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/Switch.js#L51))。
 
-### <Router>
+### &lt;Router&gt;
 所有路由组件的公共底层接口。通常app会用以下其中一个高阶路由器(high-level routers)替代：
-  - [<BrowsweRouter](https://reacttraining.com/web/api/BrowserRouter)
-  - [<HashRouter>](https://reacttraining.com/web/api/HashRouter)
-  - [<MemoryRouter>](https://reacttraining.com/react-router/)
-  - [<NativeRouter>](https://reacttraining.com/native/api/NativeRouter)
-  - [<StaticRouter>](https://reacttraining.com/react-router/)
+  - [&lt;BrowsweRouter&gt;](https://reacttraining.com/web/api/BrowserRouter)
+  - [&lt;HashRouter&gt;](https://reacttraining.com/web/api/HashRouter)
+  - [&lt;MemoryRouter&gt;](https://reacttraining.com/react-router/)
+  - [&lt;NativeRouter&gt;](https://reacttraining.com/native/api/NativeRouter)
+  - [&lt;StaticRouter&gt;](https://reacttraining.com/react-router/)
 
 通常是在想要同步自定义history和状态管理库如Redux或者Mobx时使用底层路由器`<Router>`。注意这并不意味着状态管理库一定要和React Router一起使用，这只是为了深度集成。
 
@@ -1559,12 +1559,12 @@ const customHistory = createBrowserHistory()
 </Router>
 ```
 
-### <StaticRouter>
-永远不会改变地址(location)的[<Router>](https://reacttraining.com/react-router/)。
+### &lt;StaticRouter&gt;
+永远不会改变地址(location)的[&lt;Router&gt;](https://reacttraining.com/react-router/)。
 
 在用户没有点击时，此标签对服务端渲染很有用，所以地址(location)实际上不会改变。因此得名静态路由(static)。在你想做个简单测试需要插入地址(location)并且在渲染输出中做出断言时也很有用。
 
-下面有个例子，node服务器接收到[<Redirect>](https://reacttraining.com/react-router/Redirect.md)时发送302状态码，接收到其他请求时发送普通HTML：
+下面有个例子，node服务器接收到[&lt;Redirect&gt;](https://reacttraining.com/react-router/Redirect.md)时发送302状态码，接收到其他请求时发送普通HTML：
 
 ```js
 import { createServer } from 'http'
