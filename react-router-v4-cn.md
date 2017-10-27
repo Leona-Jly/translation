@@ -1820,8 +1820,22 @@ history.replace(location)
 这样做能阻止它们使用路由器状态(router’s state)中的真实location。这对动画、等待跳转，或任何时候你想要触发组件在其他地址、而非当前真实location渲染时会很有用。
 
 ### match
+`match`对象包含了`<Route path>`如何匹配URL的信息。`match`对象包含以下属性：
+  - `params` - (object) URL中动态部分解析后的键值对
+  - `isExact` - (boolean) 若匹配整个URL则为`true`(没有尾部字符)
+  - `path` - (string) 用来匹配路径的格式。在创建嵌套路由`<Route>`时有用
+  - `url` - (string) URL中匹配的部分。在创建嵌套链接`<Link>`时有用
 
+以下地方都可以获取到`match`：
+  - [Route component](https://reacttraining.com/web/api/Route/component)中提供`this.props.match`；
+  - [Route render](https://reacttraining.com/web/api/Route/render-func)中提供`({match}) => ()`；
+  - [Route children](https://reacttraining.com/web/api/Route/children-func)中提供`({match}) => ()`；
+  - [withRouter](https://reacttraining.com/web/api/withRouter)中提供`this.props.match`；
+  - [matchPath](https://reacttraining.com/web/api/matchPath)中的返回值；
 
+若Route中没有传入`path`，则它会匹配所有路由，你会匹配到最近的父级。`withRouter`也是如此。
+
+### matchPath
 
 
 
