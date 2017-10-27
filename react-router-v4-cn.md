@@ -1725,17 +1725,123 @@ import { Switch, Route } from 'react-router'
 
 `history`对象通常有以下属性及方法：
   - length - (number) 历史栈中的数量；
-  - action - (string) 当前动作(PUSH, REPLACE, or POP)；
+  - action - (string) 当前动作(PUSH, REPLACE或者POP)；
   - location - (object) 当前地址。可能有以下属性：
     - pathname - (string) URL路径；
     - search - (string) URL的query字符串；
     - hash - (string) URL的哈希片段；
-    - state - (string) location的状态，在当前地址被推入栈时提供给比如`push(path, [state])`。只在browser history和memory history中可用。
-  - push(path, [state]) - (function) Pushes a new entry onto the history stack
-  - replace(path, [state]) - (function) Replaces the current entry on the history stack
-  - go(n) - (function) Moves the pointer in the history stack by n entries
-  - goBack() - (function) Equivalent to go(-1)
-  - goForward() - (function) Equivalent to go(1)
-  - block(prompt) - (function) Prevents navigation (see the history docs)
+    - state - (string) location的状态，在当前地址被推入栈时会传给比如`push(path, [state])`。只在browser history和memory history中可用。
+  - push(path, [state]) - (function) 向历史栈中推入新地址
+  - replace(path, [state]) - (function) 在历史栈中替换当前地址
+  - go(n) - (function) 把地址指针指向第n个地址
+  - goBack() - (function) 与go(-1)相同
+  - goForward() - (function) 与go(1)相同
+  - block(prompt) - (function) 阻止导航(参见history文档)
+
+#### history是可变的
+history对象是可变的。因此建议从[<Route>](https://reacttraining.com/web/api/Route)的参数[location](https://reacttraining.com/web/api/location)中获取地址，而非`history.location`。这能保证你关于React生命周期钩子的设想都是正确的。比如：
+```jsx
+class Comp extends React.Component {
+  componentWillReceiveProps(nextProps) {
+    // 为true
+    const locationChanged = nextProps.location !== this.props.location
+
+    // 错误写法，*永远*为false，因为history是会变的
+    const locationChanged = nextProps.history.location !== this.props.history.location
+  }
+}
+
+<Route component={Comp}/>
+```
+
+若使用其他实现方法，可能会有额外的属性提供。详情参见[history文档](https://github.com/ReactTraining/history#properties)。
+
+### location
+locations表示app当前的位置、想要去的位置、甚至是之前所在的位置。它长这样：
+```jsx
+{
+  key: 'ac3df4', // 使用HashHistory时没有！
+  pathname: '/somewhere'
+  search: '?some=search-string',
+  hash: '#howdy',
+  state: {
+    [userDefined]: true
+  }
+}
+```
+
+路由器会在以下地方提供location对象：
+  - [Route component](https://reacttraining.com/web/api/Route/component)中提供`this.props.location`；
+  - [Route render](https://reacttraining.com/web/api/Route/render-func)中提供`({location}) => ()`；
+  - [Route children](https://reacttraining.com/web/api/Route/children-func)中提供`({location}) => ()`；
+  - [withRouter](https://reacttraining.com/web/api/withRouter)中提供`this.props.location`；
+
+`history.location`中虽然也存在location，但因为它是可变的，所以不应该使用。详情参见[history](https://reacttraining.com/web/api/history)文档。
+
+location对象是永远不会变的，所以你可以在生命周期钩子里用它来判断什么时候发生了导航，这对数据获取和动画很有用。
+
+```jsx
+componentWillReceiveProps(nextProps) {
+  if (nextProps.location !== this.props.location) {
+    // 已导航成功
+  }
+}
+```
+
+你可以用location对象代替字符串传入可以导航的地方，如：
+  - Web端中[Link to](https://reacttraining.com/web/api/Link/to)
+  - Native端中[Link to](https://reacttraining.com/native/api/Link/to)
+  - [Redirect to](https://reacttraining.com/web/api/Redirect/to)
+  - [history.push](https://reacttraining.com/web/api/history/push)
+  - [history.replace](https://reacttraining.com/web/api/history/push)
+
+通常只需要传入字符串就够了，但你若需要添加一些"location state"，无论何时返回指定地址都能用时，你可以使用location对象。当你想要基于导航历史而不只是路径来扩展UI时会很有用(比如模态框modals)。
+
+```jsx
+// 通常你只需要这么做
+<Link to="/somewhere"/>
+
+// 但也可以用location代替
+const location = {
+  pathname: '/somewhere'
+  state: { fromDashboard: true }
+}
+
+<Link to={location}/>
+<Redirect to={location}/>
+history.push(location)
+history.replace(location)
+```
+
+最后，你可以在以下组件中传入location：
+  - [Route](https://reacttraining.com/web/api/Route/location)
+  - [Switch](https://reacttraining.com/web/api/Route/location)
+
+这样做能阻止它们使用路由器状态(router’s state)中的真实location。这对动画、等待跳转，或任何时候你想要触发组件在其他地址、而非当前真实location渲染时会很有用。
+
+### match
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
