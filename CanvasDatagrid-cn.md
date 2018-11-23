@@ -326,7 +326,7 @@ grid.parsers['text/csv'] = function (data, callback) {
 }
 ```
 
-注意：这个方法用来解析CSV文件是非常糟糕的。这只是单纯作为一个解析器的样本。
+注意：这个方法用来解析CSV文件是非常糟糕的。这只是单纯作为一个解析器的例子。
 
 ---
 
@@ -530,8 +530,8 @@ const grid = canvasDatagrid({
 * allowColumnReordering，默认值true。为true时，允许列重新排序。
 * allowColumnResize，默认值true。为true时，允许用户调整列宽。
 * allowColumnResizeFromCell，默认值false。为true时，允许用户通过拖拽单元格边框调整列宽。
-* allowFreezingRows，默认值false。为true时，UI会显示一条可拖拽的分割线来冻结列。
-* allowFreezingColumns，默认值false。为true时，UI会显示一条可拖拽的分割线来冻结行。
+* allowFreezingRows，默认值false。为true时，UI会显示一条可拖拽的分割线来冻结行。
+* allowFreezingColumns，默认值false。为true时，UI会显示一条可拖拽的分割线来冻结列。
 * allowMovingSelection，默认值true。为true时，用户可通过点击并拖拽选中区域的边框来移动并覆盖其他区域，原选中区域会变为空。（borderDragBehavior要设为'move'）
 * allowRowHeaderResize，默认值true。为true时，允许用户调整表头列宽。
 * allowRowReordering，默认值false。为true时，允许行重新排序。
