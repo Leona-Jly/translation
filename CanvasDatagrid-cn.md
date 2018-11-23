@@ -4,7 +4,7 @@
 [git地址](https://github.com/TonyGermaneri/canvas-datagrid)
 [API文档地址](https://tonygermaneri.github.io/canvas-datagrid/docs/index.html#canvasDatagrid)
 
-# 文档中文翻译
+# 文档中文翻译 2018.11.23
 ## Readme
 ### canvas-datagrid
 * 支持无限行和列，无需分页或加载等待；
