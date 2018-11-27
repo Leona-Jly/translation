@@ -548,8 +548,8 @@ const grid = canvasDatagrid({
 * columnSelectorHiddenText，默认值'&nbsp;&nbsp;&nbsp;'。文档有误，此处按源码来。列被隐藏时，点击右键Add/Remove columns选项中该列标题中左侧所显示的文字。
 * columnSelectorText，默认值'Add/Remove columns'。右键菜单显示/隐藏列的文字显示。
 * columnSelectorVisibleText，默认值'\u2713'。文档有误，此处按源码来。列显示时，点击右键Add/Remove columns显示/隐藏列选项中该列标题中左侧所显示的文字，默认为对勾符号√。
-* contextHoverScrollAmount，默认值2。文档未写。鼠标hover在右键菜单上滚动一下移动的数据条数。
-* contextHoverScrollRateMs，默认值5。文档未写。鼠标hover在右键菜单上滚动一下的毫秒数。
+* contextHoverScrollAmount，默认值2。文档未写。鼠标hover在右键菜单滚动箭头上滚动一下移动的距离。
+* contextHoverScrollRateMs，默认值5。文档未写。鼠标hover在右键菜单滚动箭头上滚动一下的毫秒数。
 * copyHeadersOnSelectAll，默认值true。文档未写，无效？？？。为true时，选中所有复制时也复制表头。
 * copyText，默认值'Copy'。当复制可用时，显示在右键菜单上的文字。
 * data，默认值[]。设置data，详见canvasDatagrid.data。
@@ -1006,7 +1006,7 @@ grid.style.gridBackgroundColor = 'red';
 * activeHeaderCellColor，类型string，默认值。激活状态的表头字体颜色。无效？？？
 * activeRowHeaderCellBackgroundColor，类型string，默认值rgba(225, 225, 225, 1)。激活状态单元格所在行的表头单元格背景颜色。
 * activeRowHeaderCellColor，类型string，默认值rgba(0, 0, 0, 1)。激活状态单元格所在行的表头单元格字体颜色。
-* autocompleteBottomMargin，类型number，默认值60。自动完成的下外边距margin bottom。？？？
+* autocompleteBottomMargin，类型number，默认值60。右键菜单中下拉选择框距离底部的外边距。
 * autosizeHeaderCellPadding，类型number，默认值8。自动调节大小的表头单元格内边距padding。？？？
 * autosizePadding，类型number，默认值5。自动调节大小的内边距padding。？？？
 * cellAutoResizePadding，类型number，默认值13。单元格自动调节大小的内边距padding。？？？
@@ -1072,9 +1072,9 @@ grid.style.gridBackgroundColor = 'red';
 * contextFilterInputFontSize，类型string，默认值14px。右键菜单过滤输入框字体大小。文档未写。
 * contextFilterInvalidRegExpBackground，类型string，默认值rgba(180, 6, 1, 1)。右键菜单过滤正则验证不通过的背景颜色。文档未写。
 * contextFilterInvalidRegExpColor，类型string，默认值rgba(255, 255, 255, 1)。右键菜单过滤正则验证不通过的字体颜色。文档未写。
-* contextMenuArrowColor，类型string，默认值rgba(43, 48, 43, 1)。右键菜单箭头颜色。
-* contextMenuArrowDownHTML，类型string，默认值'&#x25BC;'。右键菜单向下箭头的html。
-* contextMenuArrowUpHTML，类型string，默认值'&#x25B2;'。右键菜单向上箭头的html。
+* contextMenuArrowColor，类型string，默认值rgba(43, 48, 43, 1)。右键菜单用于滚动的上下箭头颜色。
+* contextMenuArrowDownHTML，类型string，默认值'&#x25BC;'。右键菜单向下滚动箭头的html。
+* contextMenuArrowUpHTML，类型string，默认值'&#x25B2;'。右键菜单向上滚动箭头的html。
 * contextMenuBackground，类型string，默认值rgba(240, 240, 240, 1)。右键菜单背景颜色。
 * contextMenuBorder，类型string，默认值'solid 1px rgba(158, 163, 169, 1)'。右键菜单边框样式。
 * contextMenuBorderRadius，类型string，默认值'3px'。右键菜单边框圆角。
@@ -1141,10 +1141,10 @@ grid.style.gridBackgroundColor = 'red';
 * minHeight，类型number，默认值inherit。最小高度。
 * minRowHeight，类型number，默认值24。最小行高。
 * minWidth，类型number，默认值inherit。最小宽度。文档未写。
-* mobileContextMenuMargin，类型number，默认值10。移动的右键菜单外边距。？？？文档未写。
-* mobileEditInputHeight，类型number，默认值30。移动的编辑输入框高度。？？？文档未写。
-* mobileEditFontFamily，类型string，默认值'sans-serif'。移动的编辑输入框字体。？？？文档未写。
-* mobileEditFontSize，类型string，默认值'16px'。移动的编辑输入框字体大小。文档未写。
+* mobileContextMenuMargin，类型number，默认值10。移动端的右键菜单外边距。文档未写。
+* mobileEditInputHeight，类型number，默认值30。移动端的编辑输入框高度。文档未写。
+* mobileEditFontFamily，类型string，默认值'sans-serif'。移动端的编辑输入框字体。文档未写。
+* mobileEditFontSize，类型string，默认值'16px'。移动端的编辑输入框字体大小。文档未写。
 * moveOverlayBorderColor，类型string，默认值rgba(66, 133, 244, 1)。移动选中区域时的边框颜色。
 * moveOverlayBorderSegments，类型string，默认值'12, 7'。移动选中区域时的边框虚线样式。
 * moveOverlayBorderWidth，类型number，默认值1。移动选中区域时的边框宽度。
