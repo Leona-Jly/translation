@@ -562,7 +562,7 @@ const grid = canvasDatagrid({
 * formatters，默认值{}。设置格式化的值，详见canvasDatagrid.formatters。
 * globalRowResize，默认值false。为true时，调整一行的高度将会应用到所有行。
 * hideColumnText，默认值'Hide %s'。右键菜单中隐藏列的显示文本。
-* maxAutoCompleteItems，默认值200。文档未写。
+* maxAutoCompleteItems，默认值200。右键菜单中过滤项的下拉选项框最多显示几项，0表示1项，以此类推。文档未写。
 * maxPixelRatio，默认值1.5。最大像素比。高DPI设备的最大像素比。高DPI设备会引起性能迟缓，这会影响表格渲染。标准分辨率（比如1920×1080）像素比为1:1，更高的分辨率会有更高的像素比（如Retina设备像素比为2:1）。数字越高对应分辨率越高，数字越低分辨率越低。把值设为小于1的数可能会很有趣哦，我反正是没干过这事。
 * multiLine，默认值false。设为true时，单元格编辑框为textarea文本框，false时为input输入框。详见tutorial--Use-a-textarea-to-edit-cells-instead-of-an-input。
 * name，默认值''。可选项，可在浏览器本地存储中存入列高，行宽等。每个表格的name必须是唯一的。
@@ -1063,15 +1063,15 @@ grid.style.gridBackgroundColor = 'red';
 * columnHeaderOrderByArrowWidth，类型number，默认值13。列表头排序箭头的宽度。
 * contextFilterButtonBorder，类型string，默认值'solid 1px rgba(158, 163, 169, 1)'。右键菜单过滤按钮边框样式。
 * contextFilterButtonBorderRadius，类型string，默认值'3px'。右键菜单过滤按钮边框圆角radius。
-* contextFilterButtonHTML，类型string，默认值'&#x25BC;'。右键菜单过滤按钮html。
+* contextFilterButtonHTML，类型string，默认值'&#x25BC;'。右键菜单过滤项中下拉菜单的下拉按钮html。
 * contextFilterInputBackground，类型string，默认值rgba(255,255,255,1)。右键菜单过滤输入框背景颜色。文档未写。
 * contextFilterInputBorder，类型string，默认值'solid 1px rgba(158, 163, 169, 1)'。右键菜单过滤输入框边框样式。文档未写。
 * contextFilterInputBorderRadius，类型number，默认值0。右键菜单过滤输入框边框圆角。文档未写。
 * contextFilterInputColor，类型string，默认值rgba(0,0,0,1)。右键菜单过滤输入框字体颜色。文档未写。
 * contextFilterInputFontFamily，类型string，默认值sans-serif。右键菜单过滤输入框字体。文档未写。
 * contextFilterInputFontSize，类型string，默认值14px。右键菜单过滤输入框字体大小。文档未写。
-* contextFilterInvalidRegExpBackground，类型string，默认值rgba(180, 6, 1, 1)。右键菜单过滤正则验证不通过的背景颜色。文档未写。
-* contextFilterInvalidRegExpColor，类型string，默认值rgba(255, 255, 255, 1)。右键菜单过滤正则验证不通过的字体颜色。文档未写。
+* contextFilterInvalidRegExpBackground，类型string，默认值rgba(180, 6, 1, 1)。右键菜单过滤输入框输入的正则不合法时的背景颜色。文档未写。
+* contextFilterInvalidRegExpColor，类型string，默认值rgba(255, 255, 255, 1)。右键菜单过滤输入框输入的正则不合法时的字体颜色。文档未写。
 * contextMenuArrowColor，类型string，默认值rgba(43, 48, 43, 1)。右键菜单用于滚动的上下箭头颜色。
 * contextMenuArrowDownHTML，类型string，默认值'&#x25BC;'。右键菜单向下滚动箭头的html。
 * contextMenuArrowUpHTML，类型string，默认值'&#x25B2;'。右键菜单向上滚动箭头的html。
